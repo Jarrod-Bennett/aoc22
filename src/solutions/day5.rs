@@ -18,8 +18,7 @@ impl Stacks {
         // why do we have to allocate?
         let line = line.chars().collect::<Vec<char>>();
 
-        let mut column: usize = 0;
-        for i in (0..line.len()).step_by(4) {
+        for (column, i) in (0..line.len()).step_by(4).enumerate() {
             match &line[i..i + 3] {
                 ['[', cargo, ']'] => {
                     self.stacks.get_mut(column).unwrap().0.push((*cargo).into());
@@ -27,7 +26,6 @@ impl Stacks {
                 [' ', ' ', ' '] => {} // empty row is fine, do nothing
                 _ => return Err(format!("Could not parse element {}", "e")),
             }
-            column += 1;
         }
 
         Ok(())
@@ -77,14 +75,8 @@ impl Stacks {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 struct CrateStack(Vec<Crate>);
-
-impl Default for CrateStack {
-    fn default() -> Self {
-        Self(Vec::new())
-    }
-}
 
 impl From<&str> for CrateStack {
     fn from(s: &str) -> Self {
@@ -95,7 +87,7 @@ impl From<&str> for CrateStack {
 impl CrateStack {
     /// Move `n` crates from this stack to another.
     /// Returns an error if `n` exceeds the number of crates in the stack
-    fn move_crates(&mut self, other: &mut Self, n: usize) -> Result<(), String> {
+    fn _move_crates(&mut self, other: &mut Self, n: usize) -> Result<(), String> {
         if self.0.len() < n {
             return Err(format!(
                 "Attempted to move {} crates but CrateStack has {} crates (attempted to
@@ -123,9 +115,9 @@ impl From<char> for Crate {
     }
 }
 
-impl Into<char> for Crate {
-    fn into(self) -> char {
-        self.0
+impl From<Crate> for char {
+    fn from(c: Crate) -> Self {
+        c.0
     }
 }
 
